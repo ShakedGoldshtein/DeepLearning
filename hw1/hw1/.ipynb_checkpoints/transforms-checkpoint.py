@@ -38,7 +38,7 @@ class FlipUpDown(object):
         """
         # Flip the input image so that up is down.
         # ====== YOUR CODE: ======
-        return x.flip(2)
+        return x.flip(1)
         # ========================
 
 
