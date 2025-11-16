@@ -17,7 +17,7 @@ class LinearClassifier(object):
         self.n_features = n_features
         self.n_classes = n_classes
 
-        # TODO:
+        # :
         #  Create weights tensor of appropriate dimensions
         #  Initialize it from a normal dist with zero mean and the given std.
 
@@ -38,7 +38,7 @@ class LinearClassifier(object):
                 per sample.
         """
 
-        # TODO:
+        # :
         #  Implement linear prediction.
         #  Calculate the score for each class using the weights and
         #  return the class y_pred with the highest score.
@@ -61,7 +61,7 @@ class LinearClassifier(object):
         :return: The accuracy in percent.
         """
 
-        # TODO:
+        # :
         #  calculate accuracy of prediction.
         #  Do not use an explicit loop.
 
@@ -103,7 +103,20 @@ class LinearClassifier(object):
             #     using the weight_decay parameter.
 
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            for x, y in dl_train:
+                y_pred, class_scores = self.predict(x)
+                loss = loss_fn(x, y, class_scores, y_pred)
+                loss += (weight_decay * torch.norm(self.weights) ** 2) / 2
+                self.weights.grad = loss_fn.grad()
+                self.weights.data -= learn_rate * self.weights.grad
+            for x, y in dl_valid:
+                y_pred, class_scores = self.predict(x)
+                loss = loss_fn(x, y, class_scores, y_pred)
+                loss += (weight_decay * torch.norm(self.weights) ** 2) / 2
+                valid_res.accuracy.append(self.evaluate_accuracy(y, y_pred))
+                valid_res.loss.append(loss.item())
+            train_res.accuracy.append(total_correct / len(dl_train.dataset))
+            train_res.loss.append(average_loss / len(dl_train.dataset))
             # ========================
             print(".", end="")
 

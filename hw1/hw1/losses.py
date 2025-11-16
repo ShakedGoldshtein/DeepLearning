@@ -57,7 +57,7 @@ class SVMHingeLoss(ClassifierLoss):
         loss = M.clamp(min=0).sum() / x_scores.shape[0]
         # ========================
 
-        # TODO: Save what you need for gradient calculation in self.grad_ctx
+        #: Save what you need for gradient calculation in self.grad_ctx
         # ====== YOUR CODE: ======
         self.grad_ctx = {'M':M,'x': x,'y': y}
         # ========================
@@ -77,10 +77,13 @@ class SVMHingeLoss(ClassifierLoss):
 
         grad = None
         # ====== YOUR CODE: ======
-        grad = torch.zeros_like(self.grad_ctx['x'].T)
+        grad = torch.zeros_like(self.grad_ctx['M'])
         grad[self.grad_ctx['M'] > 0] = 1
-        grad[torch.arange(self.grad_ctx['x'].shape[0]), self.grad_ctx['y']] = -self.grad_ctx['x'].shape[0]
+        violation_count = (self.grad_ctx['M'] > 0).sum(dim=1).float()
+        grad[torch.arange(self.grad_ctx['x'].shape[0]), self.grad_ctx['y']] = -violation_count
+        grad = self.grad_ctx['x'].T @ grad
         grad = grad / self.grad_ctx['x'].shape[0]
+
         # ========================
 
         return grad
