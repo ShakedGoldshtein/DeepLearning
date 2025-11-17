@@ -160,7 +160,7 @@ class LinearClassifier(object):
         w_images = self.weights
         if has_bias:
             w_images = w_images[1:]
-        w_images = w_images.reshape(self.n_classes, C, H, W)
+        w_images = torch.reshape(w_images.T,(self.n_classes,C,H,W))
         # ========================
 
         return w_images
