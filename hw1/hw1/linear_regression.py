@@ -28,11 +28,11 @@ class LinearRegressor(BaseEstimator, RegressorMixin):
         X = check_array(X)
         check_is_fitted(self, "weights_")
 
-        # TODO: Calculate the model prediction, y_pred
+        # Calculate the model prediction, y_pred
 
         y_pred = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        y_pred = X @ self.weights_
         # ========================
 
         return y_pred
@@ -45,13 +45,21 @@ class LinearRegressor(BaseEstimator, RegressorMixin):
         """
         X, y = check_X_y(X, y)
 
-        # TODO:
         #  Calculate the optimal weights using the closed-form solution you derived.
         #  Use only numpy functions. Don't forget regularization!
 
         w_opt = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        N = X.shape[0]
+        D = X.shape[-1]
+        
+        reg = self.reg_lambda * N * np.eye(D)
+        reg[0, 0] = 0
+        
+        A = X.T @ X + reg
+        b = X.T @ y
+        
+        w_opt = np.linalg.solve(A, b)
         # ========================
 
         self.weights_ = w_opt
@@ -75,9 +83,13 @@ def fit_predict_dataframe(
         features are used.
     :return: A vector of predictions, y_pred.
     """
-    # TODO: Implement according to the docstring description.
+    # Implement according to the docstring description.
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    y = df[target_name].values
+    if feature_names is None:
+        feature_names = df.columns[:-1]
+    x = df[feature_names].values
+    y_pred = model.fit_predict(x, y)
     # ========================
     return y_pred
 
@@ -117,7 +129,7 @@ class BostonFeaturesTransformer(BaseEstimator, TransformerMixin):
         # TODO: Your custom initialization, if needed
         # Add any hyperparameters you need and save them as above
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        self.polynomial = sklearn.preprocessing.PolynomialFeatures(self.degree, interaction_only=True, include_bias=False)
         # ========================
 
     def fit(self, X, y=None):
@@ -139,7 +151,10 @@ class BostonFeaturesTransformer(BaseEstimator, TransformerMixin):
 
         X_transformed = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        X_before = np.delete(X, 3, 1)
+        X_before[:, 0] = np.log(X_before[:, 0] + 1e-6)
+        X_before[:, -1] = np.log(X_before[:, -1] + 1e-6)
+        X_transformed = self.polynomial.fit_transform(X_before)        
         # ========================
 
         return X_transformed
@@ -234,7 +249,7 @@ def cv_best_hyperparams(
     #  - You can use MSE or R^2 as a score.
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    raise NotImplementedError()# Bui
     # ========================
 
     return best_params
