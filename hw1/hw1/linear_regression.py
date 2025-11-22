@@ -249,7 +249,22 @@ def cv_best_hyperparams(
     #  - You can use MSE or R^2 as a score.
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError()# Bui
+    param_grid = {
+        'bostonfeaturestransformer__degree': degree_range,
+        'linearregressor__reg_lambda': lambda_range
+    }
+    
+    grid_search = sklearn.model_selection.GridSearchCV(
+        model, 
+        param_grid, 
+        cv=k_folds, 
+        scoring='neg_mean_squared_error',
+        return_train_score=False
+    )
+    
+    grid_search.fit(X, y)
+    
+    best_params = grid_search.best_params_
     # ========================
 
     return best_params
