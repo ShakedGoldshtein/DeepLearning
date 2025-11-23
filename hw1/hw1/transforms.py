@@ -38,7 +38,7 @@ class FlipUpDown(object):
         """
         # Flip the input image so that up is down.
         # ====== YOUR CODE: ======
-        return x.flip(2)
+        return x.flip(1)
         # ========================
 
 
@@ -59,7 +59,6 @@ class BiasTrick(object):
         """
         assert x.dim() > 0, "Scalars not supported"
 
-        # TODO:
         #  Add a 1 at the beginning of the given tensor's feature dimension.
         #  Hint: See torch.cat().
         # ====== YOUR CODE: ======

@@ -17,7 +17,6 @@ def random_labelled_image(
     :param dtype: Data type of the returned image tensor.
     :return: A tuple containing the generated image tensor and it's label.
     """
-    # TODO:
     #  Implement according to the docstring description.
     # ====== YOUR CODE: ======
     image = torch.randint(low, high, shape, dtype=dtype)

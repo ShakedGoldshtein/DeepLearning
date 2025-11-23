@@ -52,7 +52,6 @@ def create_train_validation_loaders(
     if not (0.0 < validation_ratio < 1.0):
         raise ValueError(validation_ratio)
 
-    # TODO:
     #  Create two DataLoader instances, dl_train and dl_valid.
     #  They should together represent a train/validation split of the given
     #  dataset. Make sure that:

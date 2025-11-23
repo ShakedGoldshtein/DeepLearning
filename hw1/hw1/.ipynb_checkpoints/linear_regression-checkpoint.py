@@ -126,7 +126,7 @@ class BostonFeaturesTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, degree=2):
         self.degree = degree
 
-        # TODO: Your custom initialization, if needed
+        # Your custom initialization, if needed
         # Add any hyperparameters you need and save them as above
         # ====== YOUR CODE: ======
         self.polynomial = sklearn.preprocessing.PolynomialFeatures(self.degree, interaction_only=True, include_bias=False)
@@ -143,7 +143,6 @@ class BostonFeaturesTransformer(BaseEstimator, TransformerMixin):
         """
         X = check_array(X)
 
-        # TODO:
         #  Transform the features of X into new features in X_transformed
         #  Note: You CAN count on the order of features in the Boston dataset
         #  (this class is "Boston-specific"). For example X[:,1] is the second
@@ -249,7 +248,22 @@ def cv_best_hyperparams(
     #  - You can use MSE or R^2 as a score.
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError()# Bui
+    param_grid = {
+        'bostonfeaturestransformer__degree': degree_range,
+        'linearregressor__reg_lambda': lambda_range
+    }
+    
+    grid_search = sklearn.model_selection.GridSearchCV(
+        model, 
+        param_grid, 
+        cv=k_folds, 
+        scoring='neg_mean_squared_error',
+        return_train_score=False
+    )
+    
+    grid_search.fit(X, y)
+    
+    best_params = grid_search.best_params_
     # ========================
 
     return best_params

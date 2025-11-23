@@ -126,7 +126,7 @@ class BostonFeaturesTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, degree=2):
         self.degree = degree
 
-        # TODO: Your custom initialization, if needed
+        # Your custom initialization, if needed
         # Add any hyperparameters you need and save them as above
         # ====== YOUR CODE: ======
         self.polynomial = sklearn.preprocessing.PolynomialFeatures(self.degree, interaction_only=True, include_bias=False)
@@ -143,7 +143,6 @@ class BostonFeaturesTransformer(BaseEstimator, TransformerMixin):
         """
         X = check_array(X)
 
-        # TODO:
         #  Transform the features of X into new features in X_transformed
         #  Note: You CAN count on the order of features in the Boston dataset
         #  (this class is "Boston-specific"). For example X[:,1] is the second
