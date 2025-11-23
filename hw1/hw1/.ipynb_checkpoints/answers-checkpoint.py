@@ -19,7 +19,7 @@ part1_q1 = r"""
 Each time, the model is tested on data it has never seen during training, so the validation accuracy of each fold provides an estimate of the model's performance on unseen data. Moreover,  in cross-validation, it produces $k$ different validation errors, one from each fold. By averaging these $k$ validation errors, we obtain a more stable and reliable approximation of the model's generalization error. Since every fold uses a different subset of the data for validation, the evaluation does not depend on a single train-test split, which could be unrepresentative or susceptible to overfitting.
 This reduces the risk of overfitting during model selection and hyperparameter tuning. Instead of optimizing the model based on performance on one specific validation set (which may bias the model toward that particular subset and make the accuracy of this choosing unrepresentitive), cross-validation makes sure that hyperparameters are chosen based on performance across multiple distinct validation sets. Thus, the selection process becomes less local to a particular dataset partition and more global, and actually reflecting the model's behavior across the entire dataset.
 
-4.	True. Adding noise can assist in making sure the model is not too sensitive to little changes in the data. It can also help in avoiding overfitting, as the training sets is no longer that "perfect". And also it makes the model deal with more realistic scenarios as happens in the real world, where real data can be skewed a lot of times.
+4.	True. Adding noise can assist in making sure the model is not too sensitive to little changes in the data. And also it helps to get the idea of how good the model deals with realistic scenarios, where real data can be skewed a lot of times.
 
 
 """
@@ -82,8 +82,6 @@ part3_q2 = r"""
 1. Yes it is still a linear regression model. The non linearities are being added in a pre processing step, and after that it can be considered as a linear model again.
 2. In principle, in a compact domain (for instance if y is bounded), the universal approximation theorem applies, and therefore yes, any function can be approximated with ReLU's foor example, and non-linearities. In any case, usually we can treat the y values as bounded because we know that for example a 700k dollars house is not possible for most cases.
 3. Like we saw in lecture for using ReLU to "bend" the linear hyper-plane, adding non linearities can "curve" and "bend" and "twist" the hyper-plane and change the shape of it, thus allowing better data separation. Afte that it would not be a hyper-plane, since linearity for elements in it won’t exist anymore.
-Write your answer using **markdown** and $\LaTeX$:
-```python
 """
 
 part3_q3 = r"""
@@ -181,7 +179,7 @@ $$
 \mathbb{E}_x[|\hat{x} - x|] = \hat{x}^2 - \hat{x} + \frac{1}{2}
 $$
 
-3.	Because the $\frac{1}{2}$ is a constant which does not effect the minimization, just as we saw in the derivation of the $L_2$ loss function in lecture, all constants do not matter for the minimization objective.
+3.	Because the $\frac{1}{2}$ is a constant which does not effect the minimization, just as we saw in the derivation of the $L_2$ loss function in lecture, all constants do not matter for the minimization objective. In addition, one can say that in computing the gradient of the loss function, the constant's derivative is 0, therefore it does not effect the gradient steps.  
 """
 
 # ==============
