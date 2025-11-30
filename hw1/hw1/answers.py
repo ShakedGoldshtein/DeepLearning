@@ -80,7 +80,9 @@ The ideal case is that all residuals are as close as possible to 0, maybe even a
 part3_q2 = r"""
 **Your answer:**
 1. Yes it is still a linear regression model. The non linearities are being added in a pre processing step, and after that it can be considered as a linear model again.
-2. In principle, in a compact domain (for instance if y is bounded), the universal approximation theorem applies, and therefore yes, any function can be approximated with ReLU's foor example, and non-linearities. In any case, usually we can treat the y values as bounded because we know that for example a 700k dollars house is not possible for most cases.
+2. In principle, we could think that by adding enough nonlinear transformations on the features, we could approximate almost any nonlinear function, somewhat like in the universal approximation theorem.
+
+However, in reality, a linear model with nonlinear feature expansions can only represent functions that lie in the linear span of the specific features we include. This means its expressive power is entirely limited by the chosen feature set, and it cannot fit arbitrary nonlinear functions, only those that can be represented (or well-approximated) using the transformations.
 3. Like we saw in lecture for using ReLU to "bend" the linear hyper-plane, adding non linearities can "curve" and "bend" and "twist" the hyper-plane and change the shape of it, thus allowing better data separation. Afte that it would not be a hyper-plane, since linearity for elements in it won’t exist anymore.
 """
 
