@@ -5,7 +5,7 @@ channels:
   - defaults
 dependencies:
   # common
-  - ffmpeg==4.2.2 # needed for gym video output
+  - ffmpeg # needed for gym video output
   - ipython
   - jupyter
   - jupyterlab
@@ -23,13 +23,13 @@ dependencies:
   - tqdm
   - pip:
     - nbmerge
-    - gym[atari,accept-rom-license,box2d]==0.21.0
+  #  - gym[atari,accept-rom-license,box2d]==0.21.0
   # pytorch
   # Note for M1 macs: install this env with CONDA_SUBDIR=osx-64 (env var), as it
   # can't be installed for the native (osx-arm64) architecture.
   - pytorch=1.10.1
-  - mkl<2022 # prevents crash when importing torch on M1 mac via rosetta2
-  - cudatoolkit
+#  - mkl<2022 # prevents crash when importing torch on M1 mac via rosetta2
+#  - cudatoolkit
   - torchvision
   - torchtext
 
