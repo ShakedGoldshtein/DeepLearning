@@ -63,8 +63,8 @@ def part2_optim_hp():
     # You may want to use different learning rates for each optimizer.
     # ====== YOUR CODE: ======
     wstd = 0.01
-    lr_vanilla = 0.01
-    lr_momentum = 0.01
+    lr_vanilla = 0.03
+    lr_momentum = 0.0025
     lr_rmsprop = 0.01
     reg = 0.01
     # ========================
