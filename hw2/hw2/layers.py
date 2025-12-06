@@ -356,13 +356,18 @@ class Dropout(Layer):
         super().__init__()
         assert 0.0 <= p < 1.0
         self.p = p
+        self.mask = None
 
     def forward(self, x, **kw):
         # TODO: Implement the dropout forward pass.
         #  Notice that contrary to previous layers, this layer behaves
         #  differently a according to the current training_mode (train/test).
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        if self.training_mode:
+            self.mask = (torch.rand_like(x) > self.p).float()
+            out = x * self.mask 
+        else:
+            out = x
         # ========================
 
         return out
@@ -370,7 +375,11 @@ class Dropout(Layer):
     def backward(self, dout):
         # TODO: Implement the dropout backward pass.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        
+        if self.training_mode:
+            dx = dout * self.mask
+        else:
+            dx = dout
         # ========================
 
         return dx
@@ -492,6 +501,8 @@ class MLP(Layer):
         for hidden_dim in hidden_features:
             layers.append(Linear(input_dim, hidden_dim))
             layers.append(activation())
+            if dropout > 0:
+                layers.append(Dropout(dropout))
             input_dim = hidden_dim
         layers.append(Linear(input_dim, num_classes))
         # ========================

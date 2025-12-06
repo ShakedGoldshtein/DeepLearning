@@ -265,7 +265,13 @@ class ClassifierTrainer(Trainer):
         #  - Update parameters
         #  - Classify and calculate number of correct predictions
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        self.optimizer.zero_grad()
+        z = self.model(X)
+        loss = self.loss_fn(z, y)
+        loss.backward()
+        self.optimizer.step()
+        batch_loss = loss.item()
+        num_correct = (self.model.classify(X) == y).sum().item()
         # ========================
 
         return BatchResult(batch_loss, num_correct)
@@ -285,7 +291,10 @@ class ClassifierTrainer(Trainer):
             #  - Forward pass
             #  - Calculate number of correct predictions
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            z = self.model(X)
+            loss = self.loss_fn(z, y)
+            batch_loss = loss.item()
+            num_correct = (self.model.classify(X) == y).sum().item()
             # ========================
 
         return BatchResult(batch_loss, num_correct)
