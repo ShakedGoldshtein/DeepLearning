@@ -365,9 +365,9 @@ class Dropout(Layer):
         # ====== YOUR CODE: ======
         if self.training_mode:
             self.mask = (torch.rand_like(x) > self.p).float()
-            out = x * self.mask 
+            out = x * self.mask/(1-self.p) # x * self.mask
         else:
-            out = x
+            out = x #out=x*(1-self.p)
         # ========================
 
         return out
@@ -377,9 +377,9 @@ class Dropout(Layer):
         # ====== YOUR CODE: ======
         
         if self.training_mode:
-            dx = dout * self.mask
+            dx = dout * self.mask/(1-self.p) # dout * self.mask
         else:
-            dx = dout
+            dx = dout # dout*(1-self.p)
         # ========================
 
         return dx

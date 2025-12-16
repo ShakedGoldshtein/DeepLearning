@@ -85,9 +85,9 @@ class Trainer(abc.ABC):
             # ====== YOUR CODE: ======
             train_result = self.train_epoch(dl_train)
             test_result = self.test_epoch(dl_test)
-            train_loss.append(train_result.losses)
+            train_loss.extend(train_result.losses)
             train_acc.append(train_result.accuracy)
-            test_loss.append(test_result.losses)
+            test_loss.extend(test_result.losses)
             test_acc.append(test_result.accuracy)
             # ========================
 
@@ -265,6 +265,9 @@ class ClassifierTrainer(Trainer):
         #  - Update parameters
         #  - Classify and calculate number of correct predictions
         # ====== YOUR CODE: ======
+        wait_time = 0.01
+        import time
+        time.sleep(wait_time)
         self.optimizer.zero_grad()
         z = self.model(X)
         loss = self.loss_fn(z, y)
@@ -324,10 +327,12 @@ class LayerTrainer(Trainer):
         loss = self.loss_fn(out, y)
         self.model.backward(self.loss_fn.backward())
         self.optimizer.step()
+        batch_loss = loss.item()
+        
         num_correct = (out.argmax(dim=1) == y).sum().item()
         # ========================
 
-        return BatchResult(loss, num_correct)
+        return BatchResult(batch_loss, num_correct)
 
     def test_batch(self, batch) -> BatchResult:
         X, y = batch
@@ -337,7 +342,8 @@ class LayerTrainer(Trainer):
         X = X.view(X.shape[0], -1)
         out = self.model(X)
         loss = self.loss_fn(out, y)
+        batch_loss = loss.item()
         num_correct = (out.argmax(dim=1) == y).sum().item()
         # ========================
 
-        return BatchResult(loss, num_correct)
+        return BatchResult(batch_loss, num_correct)

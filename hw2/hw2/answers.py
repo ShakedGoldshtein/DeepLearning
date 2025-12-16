@@ -63,8 +63,8 @@ def part2_optim_hp():
     # You may want to use different learning rates for each optimizer.
     # ====== YOUR CODE: ======
     wstd = 0.01
-    lr_vanilla = 0.03
-    lr_momentum = 0.008
+    lr_vanilla = 0.3
+    lr_momentum = 0.03
     lr_rmsprop = 0.0003
     reg = 0.0001
     # ========================
@@ -85,8 +85,8 @@ def part2_dropout_hp():
     # TODO: Tweak the hyperparameters to get the model to overfit without
     # dropout.
     # ====== YOUR CODE: ======
-    wstd = 0.1
-    lr = 0.005
+    wstd = 0.195
+    lr = 0.0008
     # ========================
     return dict(wstd=wstd, lr=lr)
 
@@ -145,10 +145,10 @@ def part3_arch_hp():
     out_activation = "none"  # activation function to apply at the output layer
     # TODO: Tweak the MLP architecture hyperparameters.
     # ====== YOUR CODE: ======
-    n_layers = 2
-    hidden_dims = 100
+    n_layers = 4
+    hidden_dims = 8
     activation = "relu"
-    out_activation = "sigmoid"
+    out_activation = "relu"
     # ========================
     return dict(
         n_layers=n_layers,
@@ -170,8 +170,8 @@ def part3_optim_hp():
     #    What you returns needs to be a callable, so either an instance of one of the
     #    Loss classes in torch.nn or one of the loss functions from torch.nn.functional.
     # ====== YOUR CODE: ======
-    lr = 0.001
-    weight_decay = 0.0001
+    lr = 0.01
+    weight_decay = 0.01
     momentum = 0.9
     loss_fn = torch.nn.CrossEntropyLoss()
     # ========================
