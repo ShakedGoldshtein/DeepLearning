@@ -70,6 +70,7 @@ class Trainer(abc.ABC):
 
         train_loss, train_acc, test_loss, test_acc = [], [], [], []
         best_acc = None
+        best_test_loss = None
 
         for epoch in range(num_epochs):
             verbose = False  # pass this to train/test_epoch.
@@ -83,11 +84,13 @@ class Trainer(abc.ABC):
             #  - Use the train/test_epoch methods.
             #  - Save losses and accuracies in the lists above.
             # ====== YOUR CODE: ======
-            train_result = self.train_epoch(dl_train)
-            test_result = self.test_epoch(dl_test)
-            train_loss.extend(train_result.losses)
+            train_result = self.train_epoch(dl_train,**kw)
+            test_result = self.test_epoch(dl_test,**kw)
+            train_loss.append(torch.mean(torch.stack(train_result.losses)).item())\
+                if isinstance(train_result.losses[0], torch.Tensor) else sum(train_result.losses) / len(train_result.losses)
             train_acc.append(train_result.accuracy)
-            test_loss.extend(test_result.losses)
+            test_loss.append(torch.mean(torch.stack(test_result.losses)).item())\
+                if isinstance(test_result.losses[0], torch.Tensor) else sum(test_result.losses) / len(test_result.losses)
             test_acc.append(test_result.accuracy)
             # ========================
 
@@ -96,7 +99,7 @@ class Trainer(abc.ABC):
             #    simple regularization technique that is highly recommended.
             #  - Optional: Implement checkpoints. You can use the save_checkpoint
             #    method on this class to save the model to the file specified by
-            #    the checkpoints argument.
+            #    the checkpoints argument.            
             if best_acc is None or test_result.accuracy > best_acc:
                 # ====== YOUR CODE: ======
                 best_acc = test_result.accuracy
@@ -265,15 +268,14 @@ class ClassifierTrainer(Trainer):
         #  - Update parameters
         #  - Classify and calculate number of correct predictions
         # ====== YOUR CODE: ======
-        wait_time = 0.01
         import time
-        time.sleep(wait_time)
+        time.sleep(0.01)
         self.optimizer.zero_grad()
         z = self.model(X)
         loss = self.loss_fn(z, y)
         loss.backward()
         self.optimizer.step()
-        batch_loss = loss.item()
+        batch_loss = loss
         num_correct = (self.model.classify(X) == y).sum().item()
         # ========================
 
@@ -296,7 +298,7 @@ class ClassifierTrainer(Trainer):
             # ====== YOUR CODE: ======
             z = self.model(X)
             loss = self.loss_fn(z, y)
-            batch_loss = loss.item()
+            batch_loss = loss
             num_correct = (self.model.classify(X) == y).sum().item()
             # ========================
 
@@ -327,12 +329,10 @@ class LayerTrainer(Trainer):
         loss = self.loss_fn(out, y)
         self.model.backward(self.loss_fn.backward())
         self.optimizer.step()
-        batch_loss = loss.item()
-        
         num_correct = (out.argmax(dim=1) == y).sum().item()
         # ========================
 
-        return BatchResult(batch_loss, num_correct)
+        return BatchResult(loss, num_correct)
 
     def test_batch(self, batch) -> BatchResult:
         X, y = batch
@@ -342,8 +342,7 @@ class LayerTrainer(Trainer):
         X = X.view(X.shape[0], -1)
         out = self.model(X)
         loss = self.loss_fn(out, y)
-        batch_loss = loss.item()
         num_correct = (out.argmax(dim=1) == y).sum().item()
         # ========================
 
-        return BatchResult(batch_loss, num_correct)
+        return BatchResult(loss, num_correct)
