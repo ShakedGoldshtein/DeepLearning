@@ -80,8 +80,12 @@ class CNN(nn.Module):
         #  Note: If N is not divisible by P, then N mod P additional
         #  CONV->ACTs should exist at the end, without a POOL after them.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
-
+        channels = [in_channels] + self.channels
+        for i in range(len(channels)):
+            layers.append(nn.Conv2d(channels[i], channels[i+1], **self.conv_params))
+            layers.append(ACTIVATIONS[self.activation_type](**self.activation_params))
+            if i % self.pool_every == 0:
+                layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
         # ========================
         seq = nn.Sequential(*layers)
         return seq
