@@ -81,10 +81,10 @@ class CNN(nn.Module):
         #  CONV->ACTs should exist at the end, without a POOL after them.
         # ====== YOUR CODE: ======
         channels = [in_channels] + self.channels
-        for i in range(len(channels)):
+        for i in range(len(channels)-1):
             layers.append(nn.Conv2d(channels[i], channels[i+1], **self.conv_params))
             layers.append(ACTIVATIONS[self.activation_type](**self.activation_params))
-            if i % self.pool_every == 0:
+            if (i+1) % self.pool_every == 0:
                 layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
         # ========================
         seq = nn.Sequential(*layers)
@@ -99,7 +99,7 @@ class CNN(nn.Module):
         rng_state = torch.get_rng_state()
         try:
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            return self.feature_extractor(torch.randn(1, *self.in_size)).numel()
             # ========================
         finally:
             torch.set_rng_state(rng_state)
@@ -113,7 +113,9 @@ class CNN(nn.Module):
         #  - The last Linear layer should have an output dim of out_classes.
         mlp: MLP = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        nonlins = [ACTIVATIONS[self.activation_type](**self.activation_params)]*len(self.hidden_dims)
+        nonlins.append("none")
+        mlp = MLP(self._n_features(), self.hidden_dims + [self.out_classes], nonlins)
         # ========================
         return mlp
 
@@ -123,7 +125,9 @@ class CNN(nn.Module):
         #  return class scores.
         out: Tensor = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        out = self.feature_extractor(x)
+        out = out.view(out.size(0), -1)
+        out = self.mlp(out)
         # ========================
         return out
 
@@ -183,14 +187,48 @@ class ResidualBlock(nn.Module):
         #  - Don't create layers which you don't use! This will prevent
         #    correct comparison in the test.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        # Create main_path
+        main_layers = []
+        current_channels = in_channels
+
+        for i, (out_channels, kernel_size) in enumerate(zip(channels, kernel_sizes)):
+            # Calculate padding to preserve spatial extent (for odd kernel sizes)
+            padding = kernel_size // 2
+            
+            # Add convolution
+            main_layers.append(nn.Conv2d(current_channels, out_channels, kernel_size, 
+                                          padding=padding, bias=True))
+            
+            # Add dropout (if dropout > 0 and not the last conv)
+            if dropout > 0 and i < len(channels) - 1:
+                main_layers.append(nn.Dropout2d(p=dropout))
+            
+            # Add batchnorm (if batchnorm and not the last conv)
+            if batchnorm and i < len(channels) - 1:
+                main_layers.append(nn.BatchNorm2d(out_channels))
+            
+            # Add activation (if not the last conv)
+            if i < len(channels) - 1:
+                main_layers.append(ACTIVATIONS[activation_type](**activation_params))
+            
+            current_channels = out_channels
+
+        self.main_path = nn.Sequential(*main_layers)
+
+        # Create shortcut_path
+        shortcut_layers = [nn.Identity()]
+        if in_channels != channels[-1]:
+            shortcut_layers.append(nn.Conv2d(in_channels, channels[-1], kernel_size=1, bias=False))   
+        
+        self.shortcut_path = nn.Sequential(*shortcut_layers)
         # ========================
 
     def forward(self, x: Tensor):
         # TODO: Implement the forward pass. Save the main and residual path to `out`.
         out: Tensor = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        out = self.main_path(x.clone())
+        out += self.shortcut_path(x.clone())
         # ========================
         out = torch.relu(out)
         return out
@@ -280,4 +318,5 @@ class ResNet(CNN):
         # ========================
         seq = nn.Sequential(*layers)
         return seq
+
 
