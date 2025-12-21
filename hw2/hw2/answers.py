@@ -369,27 +369,31 @@ two 3x3 convolutions, 256→256.
 
 1) Number of parameters
 
-A convolution with kernel KxK, C_in input channels and C_out output channels has
-K^2 · C_in · C_out parameters.
+A convolution with kernel $K \times K$, $C_{\text{in}}$ input channels and $C_{\text{out}}$ output channels has  
+$K^2 \cdot C_{\text{in}} \cdot C_{\text{out}} + C_{\text{out}}$ parameters.
 
-(A) Regular block:
-Each 3x3 conv:
-3^2 · 256 · 256 = 589,824  
-Two such layers:
+(A) Regular block:  
+Each $3 \times 3$ conv:  
+$3^2 \cdot 256 \cdot 256 + 256 = 589{,}824 + 256 = 590{,}080$  
+
+Two such layers:  
 $$
-2 \cdot 589{,}824 = 1{,}179{,}648
+2 \cdot 590{,}080 = 1{,}180{,}160
 $$
 
-(B) Bottleneck block:
-First 1x1:
-1^2 · 256 · 64 = 16,384  
-Middle 3x3:
-3^2 · 64 · 64 = 36,864  
-Last 1x1:
-1^2 · 64 · 256 = 16,384  
-Total:
+(B) Bottleneck block:  
+First $1 \times 1$:  
+$1^2 \cdot 256 \cdot 64 + 64 = 16{,}384 + 64 = 16{,}448$  
+
+Middle $3 \times 3$:  
+$3^2 \cdot 64 \cdot 64 + 64 = 36{,}864 + 64 = 36{,}928$  
+
+Last $1 \times 1$:  
+$1^2 \cdot 64 \cdot 256 + 256 = 16{,}384 + 256 = 16{,}640$  
+
+Total:  
 $$
-16{,}384 + 36{,}864 + 16{,}384 = 69{,}632
+16{,}448 + 36{,}928 + 16{,}640 = 70{,}016
 $$
 
 Thus, the bottleneck uses about 17 times fewer parameters.
