@@ -119,10 +119,12 @@ def cnn_experiment(
     #   for you automatically.
     fit_res = None
     # ====== YOUR CODE: ======
+    channels = [block_filter for block_filter in filters_per_layer for _ in range(layers_per_block)]
+    
     model_kwargs = {
         'in_size': (3, 32, 32),  # CIFAR-10: 3 channels, 32x32 pixels
         'out_classes': 10,
-        'channels': filters_per_layer,
+        'channels': channels,
         'pool_every': pool_every,
         'hidden_dims': hidden_dims,
         'conv_params': kw.get('conv_params', {'kernel_size': 3, 'stride': 1, 'padding': 1}),
@@ -140,9 +142,10 @@ def cnn_experiment(
     
     model = model_cls(**model_kwargs)
     model = model.to(device)
+    classifier_model = ArgMaxClassifier(model=model)
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=reg)
-    trainer = ClassifierTrainer(model, loss_fn, optimizer, device=device)
+    trainer = ClassifierTrainer(classifier_model, loss_fn, optimizer, device=device)
     
     dl_train = DataLoader(ds_train, batch_size=bs_train, shuffle=True)
     dl_test = DataLoader(ds_test, batch_size=bs_test, shuffle=False)
