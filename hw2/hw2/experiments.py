@@ -72,7 +72,7 @@ def cnn_experiment(
     bs_test=None,
     batches=100,
     epochs=100,
-    early_stopping=3,
+    early_stopping=6,
     checkpoints=None,
     lr=1e-3,
     reg=1e-3,
@@ -119,7 +119,30 @@ def cnn_experiment(
     #   for you automatically.
     fit_res = None
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    model_kwargs = {
+        'in_size': 32,
+        'out_classes': 10,
+        'channels': filters_per_layer,
+        'pool_every': pool_every,
+        'hidden_dims': hidden_dims
+    }
+    
+    # Only add ResNet-specific parameters if using ResNet
+    if model_type == 'resnet':
+        model_kwargs['batchnorm'] = kw.get('batchnorm', False)
+        model_kwargs['dropout'] = kw.get('dropout', 0.0)
+        model_kwargs['bottleneck'] = kw.get('bottleneck', False)
+    
+    model = model_cls(**model_kwargs)
+    model = model.to(device)
+    loss_fn = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=reg)
+    trainer = ClassifierTrainer(model, loss_fn, optimizer)
+    
+    dl_train = DataLoader(ds_train, batch_size=bs_train, shuffle=True)
+    dl_test = DataLoader(ds_test, batch_size=bs_test, shuffle=False)
+    
+    fit_res = trainer.fit(dl_train, dl_test, num_epochs=epochs, early_stopping=early_stopping, checkpoints=checkpoints, max_batches=batches, **kw)
     # ========================
 
     save_experiment(run_name, out_dir, cfg, fit_res)
