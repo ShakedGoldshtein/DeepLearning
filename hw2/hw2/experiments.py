@@ -70,7 +70,7 @@ def cnn_experiment(
     # Training params
     bs_train=128,
     bs_test=None,
-    batches=100,
+    batches=300,
     epochs=100,
     early_stopping=6,
     checkpoints=None,
