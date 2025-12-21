@@ -120,7 +120,7 @@ def cnn_experiment(
     fit_res = None
     # ====== YOUR CODE: ======
     model_kwargs = {
-        'in_size': 32,
+        'in_size': (3, 32, 32),  # CIFAR-10: 3 channels, 32x32 pixels
         'out_classes': 10,
         'channels': filters_per_layer,
         'pool_every': pool_every,
