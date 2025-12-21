@@ -124,7 +124,12 @@ def cnn_experiment(
         'out_classes': 10,
         'channels': filters_per_layer,
         'pool_every': pool_every,
-        'hidden_dims': hidden_dims
+        'hidden_dims': hidden_dims,
+        'conv_params': kw.get('conv_params', {'kernel_size': 3, 'stride': 1, 'padding': 1}),
+        'activation_type': kw.get('activation_type', 'relu'),
+        'activation_params': kw.get('activation_params', {}),
+        'pooling_type': kw.get('pooling_type', 'max'),
+        'pooling_params': kw.get('pooling_params', {'kernel_size': 2})
     }
     
     # Only add ResNet-specific parameters if using ResNet
