@@ -226,7 +226,7 @@ def parse_cli():
         "--bs-test", type=int, help="Test batch size", metavar="BATCH_SIZE"
     )
     sp_exp.add_argument(
-        "--batches", type=int, help="Number of batches per epoch", default=100
+        "--batches", type=int, help="Number of batches per epoch", default=300
     )
     sp_exp.add_argument(
         "--epochs", type=int, help="Maximal number of epochs", default=100
