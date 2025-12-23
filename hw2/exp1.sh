@@ -36,8 +36,14 @@
 #exp 1.4
 #srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp1_4 -K 32 -L 8 -P 2 -H 256 512 256 -M resnet 
 #srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp1_4 -K 32 -L 16 -P 4 -H 256 512 256 -M resnet 
-srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp1_4 -K 32 -L 32 -P 8 -H 256 512 256 -M resnet 
+#srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp1_4 -K 32 -L 32 -P 8 -H 256 512 256 -M resnet 
 
-srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp1_4 -K 64 128 256 -L 2 -P 3 -H 256 512 256 -M resnet 
-srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp1_4 -K 64 128 256 -L 4 -P 3 -H 256 512 256 -M resnet 
-srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp1_4 -K 64 128 256 -L 8 -P 6 -H 256 512 256 -M resnet 
+#srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp1_4 -K 64 128 256 -L 2 -P 3 -H 256 512 256 -M resnet 
+#srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp1_4 -K 64 128 256 -L 4 -P 3 -H 256 512 256 -M resnet 
+#srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp1_4 -K 64 128 256 -L 8 -P 6 -H 256 512 256 -M resnet 
+
+#exp2
+#srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp2 -K 32 64 128 -L 3  -P 2 -H 256 512 256 -M yourcnn
+srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp2 -K 32 64 128 -L 6  -P 4 -H 256 512 256 -M yourcnn
+srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp2 -K 32 64 128 -L 9  -P 8 -H 256 512 256 -M yourcnn
+srun -c 2 --gres=gpu:1 --pty python -m hw2.experiments run-exp -n exp2 -K 32 64 128 -L 12 -P 8 -H 256 512 256 -M yourcnn
