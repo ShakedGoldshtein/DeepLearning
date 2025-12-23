@@ -390,3 +390,95 @@ class ResNet(CNN):
         return seq
 
 
+
+class YourCNN(CNN):
+    def __init__(
+        self,
+        in_size,
+        out_classes: int,
+        channels: Sequence[int],
+        pool_every: int,
+        hidden_dims: Sequence[int],
+        conv_params: dict = {},
+        activation_type: str = "relu",
+        activation_params: dict = {},
+        pooling_type: str = "max",
+        pooling_params: dict = {},
+        batchnorm: bool = True,
+        dropout: float = 0.1,
+    ):
+        """
+        Custom CNN with improvements:
+        - Batch normalization after convolutions
+        - Dropout for regularization
+        """
+        # Store custom parameters before calling super
+        self.batchnorm = batchnorm
+        self.dropout = dropout
+        
+        # Call parent constructor
+        super().__init__(
+            in_size=in_size,
+            out_classes=out_classes,
+            channels=channels,
+            pool_every=pool_every,
+            hidden_dims=hidden_dims,
+            conv_params=conv_params,
+            activation_type=activation_type,
+            activation_params=activation_params,
+            pooling_type=pooling_type,
+            pooling_params=pooling_params,
+        )
+
+    def _make_feature_extractor(self):
+        in_channels, in_h, in_w = tuple(self.in_size)
+        
+        layers = []
+        channels = [in_channels] + self.channels
+        
+        # Provide default conv_params if kernel_size is missing
+        conv_params = self.conv_params.copy() if self.conv_params else {}
+        if 'kernel_size' not in conv_params:
+            conv_params['kernel_size'] = 3
+        if 'stride' not in conv_params:
+            conv_params['stride'] = 1
+        if 'padding' not in conv_params:
+            conv_params['padding'] = conv_params['kernel_size'] // 2
+        
+        # Provide default pooling_params if kernel_size is missing
+        pooling_params = self.pooling_params.copy() if self.pooling_params else {}
+        if 'kernel_size' not in pooling_params:
+            pooling_params['kernel_size'] = 2
+        
+        for i in range(len(channels) - 1):
+            # Convolution layer
+            layers.append(nn.Conv2d(channels[i], channels[i+1], **conv_params))
+            
+            # Batch normalization (if enabled)
+            if self.batchnorm:
+                layers.append(nn.BatchNorm2d(channels[i+1]))
+            
+            # Activation
+            layers.append(ACTIVATIONS[self.activation_type](**self.activation_params))
+            
+            # Dropout (if enabled and not last layer before pooling)
+            if self.dropout > 0 and (i+1) % self.pool_every != 0:
+                layers.append(nn.Dropout2d(p=self.dropout))
+            
+            # Pooling every pool_every layers
+            if (i+1) % self.pool_every == 0:
+                layers.append(POOLINGS[self.pooling_type](**pooling_params))
+        
+        seq = nn.Sequential(*layers)
+        return seq
+
+    def _make_mlp(self):
+        # Create activation instances for each hidden layer
+        nonlins = [ACTIVATIONS[self.activation_type](**self.activation_params)] * len(self.hidden_dims)
+        nonlins.append("none")
+        
+        mlp = MLP(self._n_features(), self.hidden_dims + [self.out_classes], nonlins)
+        return mlp
+
+    def forward(self, x: Tensor):
+        return super().forward(x)
