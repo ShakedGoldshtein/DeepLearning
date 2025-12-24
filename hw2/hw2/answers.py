@@ -471,54 +471,40 @@ very deep networks much more stable.
 
 
 part5_q1 = r"""
-**Your answer:**
+1. From our results, we can clearly see that beyond a certain point, as the number of layers increases and the network becomes deeper, the accuracy decreases.
+There is a clear sweet spot in the case of $L=4$ when $K=64$ (while for $K=32$ the behavior was monotonic).
+A reasonable explanation for this is the vanishing gradients problem, where gradients decay too much and therefore fail to significantly affect parameter updates.
+It is possible that choosing different hyperparameters would have resulted in a sweet spot at a depth that is not the minimal one among the options (e.g., $4$ or $8$), even for $K=32$.
+However, due to server runtime constraints and load, it was not possible to test many hyperparameter configurations.
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+2. For $L=8,16$, the network did not train at all, and we obtained an accuracy of approximately $10\%$, which corresponds to a uniform distribution — i.e., completely random predictions with no predictive power.
+To address this, at least partially, one can use residual blocks, which propagate the input value forward and ensure that gradients are not multiplied along the entire chain by numbers smaller than $1$, but rather by values closer to or larger than $1$.
+Another option is to apply batch normalization, i.e., normalizing the batch inputs in order to better represent the distribution and ensure that different inputs operate within the same value range, potentially preventing cases where certain gradients become insignificant relative to others.
 
 """
 
 part5_q2 = r"""
-**Your answer:**
+In the results of Experiment 1.2, we observe strong similarity to Experiment 1.1.
+For $L=2,4$, the model performs well, while for $L=8$ the model fails to train, resulting again in $10\%$ accuracy.
+It is possible that different hyperparameter choices would have produced a more meaningful difference, but in our results, no substantial distinction is observed.
+We can see that when $K=128$, the performance is the best.
+That is, in Experiment 1.2, which uses more filters, we obtain higher accuracy compared to Experiment 1.1, which uses fewer filters.
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 
 part5_q3 = r"""
-**Your answer:**
-
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
+In Experiment 1.3, we observe the same pattern.
+As the number of layers increases, the accuracy decreases, most likely for the same reasons discussed earlier.
+Again, it can be argued that different hyperparameter choices might have led to different results, but due to server load, it was practically impossible to run the experiments more than once or twice.
+For $L=3,4$, the model did not train at all.
 """
 
 part5_q4 = r"""
-**Your answer:**
-
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+In Experiment 1.4, we used a ResNet architecture, which employs residual blocks.
+Compared to Experiments 1.1 and 1.3, we can clearly see that there is no complete vanishing gradients issue, and there is no model that completely failed to learn in Experiment 1.4.
+However, we still observe that as the number of layers increases, the accuracy decreases.
+Once again, it can be argued that with different hyperparameter choices, it might be possible to obtain a sweet spot at an intermediate depth.
 
 """
 
@@ -530,15 +516,24 @@ An equation: $e^{i\pi} -1 = 0$
 
 
 part6_q1 = r"""
-**Your answer:**
+1. The model performed poorly.
+It classified dolphins as humans — one with very high confidence of $90\%$, and another with $50\%$ confidence, which is not particularly high.
+In addition, it classified a dolphin’s rear fin as a surfboard with low confidence.
+In a second image, the model classified two dogs as a cat, with confidences of $0.66$ and $0.39$, and another dog was correctly classified but with a confidence of only $0.5$, which is much lower than desired.
+Additionally, there was a cat in the image that the model did not classify at all.
 
+2. One possible explanation is that the model was not trained on dolphins at all.
+It is also possible that it was trained only on dogs that look different from those in the image, while the dogs in the image have upright ears resembling those of cats, as well as different angles or poses.
+One possible solution is to increase the confidence threshold required to assign a class and introduce an additional \textit{unclassified} class if no class exceeds the threshold.
+This way, we at least avoid false positives.
+Another approach is to retrain the model on new data that better captures the diversity present in the images.
+Additionally, retraining the model using a CNN that learns more informative features could help reduce reliance on superficial cues such as pose or orientation.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+3. The method is as follows:
+We train a model to introduce a specific type of noise that is barely perceptible to the human eye — i.e., the image still appears as a cat, etc. — but causes the model to fail.
+How is this training performed?
+We aim to inject noise into regions related, for example, to the cat’s head, such that the confidence assigned to the cat class is significantly reduced.
+Based on this, we define the loss function of the attacking model, which then determines how to modify the noise in terms of values and locations.
 
 """
 
@@ -558,15 +553,7 @@ An equation: $e^{i\pi} -1 = 0$
 
 
 part6_q3 = r"""
-**Your answer:**
-
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+The model classified our images very well, except for the surfboard, which achieved $46\%$ accuracy, although this was still the highest score among the classes.
 
 """
 
