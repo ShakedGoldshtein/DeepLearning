@@ -200,14 +200,12 @@ class SequenceBatchSampler(torch.utils.data.Sampler):
         #  you can drop it.
         idx = None  # idx should be a 1-d list of indices.
         # ====== YOUR CODE: ======
-        idx = list(range(len(self.dataset)))
-        num_complete_batches = len(idx) // self.batch_size
-        for i in range(num_complete_batches):
-            batch_start = i * self.batch_size
-            for j in range(self.batch_size):
-                yield idx[batch_start + j]
+        n = len(self.dataset)
+        num_batches = n // self.batch_size
+        for i in range(num_batches):
+            for j in range(i, i+(self.batch_size)*num_batches, num_batches):
+                yield j
         # ========================
-        return iter(idx)
 
     def __len__(self):
         return len(self.dataset)
@@ -237,7 +235,42 @@ class MultilayerGRU(nn.Module):
         self.layer_params = []
 
         # ====== YOUR CODE: ======
-        pass
+        prev_dim = self.in_dim
+        for i in range(self.n_layers):
+            # Update gate (z) - corresponds to update_wx, update_wh
+            update_wx = nn.Linear(prev_dim, self.h_dim, bias=False)
+            update_wh = nn.Linear(self.h_dim, self.h_dim, bias=True)
+            
+            # Reset gate (r) - corresponds to reset_wx, reset_wh
+            reset_wx = nn.Linear(prev_dim, self.h_dim, bias=False)
+            reset_wh = nn.Linear(self.h_dim, self.h_dim, bias=True)
+            
+            # Candidate state (g) - corresponds to candidate_wx, candidate_wh
+            candidate_wx = nn.Linear(prev_dim, self.h_dim, bias=False)
+            candidate_wh = nn.Linear(self.h_dim, self.h_dim, bias=True)
+            
+            # Dropout layer
+            dropout_layer = nn.Dropout(dropout)
+            
+            # Register as modules so PyTorch can track parameters
+            self.add_module('z_x_' + str(i), update_wx)
+            self.add_module('z_h_' + str(i), update_wh)
+            self.add_module('r_x_' + str(i), reset_wx)
+            self.add_module('r_h_' + str(i), reset_wh)
+            self.add_module('g_x_' + str(i), candidate_wx)
+            self.add_module('g_h_' + str(i), candidate_wh)
+            self.add_module('drop_' + str(i), dropout_layer)
+            
+            prev_dim = self.h_dim
+            # Store as tuple to match forward pass unpacking
+            self.layer_params.append((update_wx, update_wh, reset_wx, reset_wh, 
+                                     candidate_wx, candidate_wh, dropout_layer))
+        
+        # Output layer: maps from h_dim to out_dim
+        output_layer = nn.Linear(self.h_dim, self.out_dim, bias=True)
+        self.add_module('out', output_layer)
+        # Store as tuple with single element to match forward pass: self.layer_params[-1][0]
+        self.layer_params.append((output_layer,))
         # ========================
 
     def forward(self, input: Tensor, hidden_state: Tensor = None):

@@ -1,4 +1,4 @@
-name: cs236781-hw
+name: cs236781-guri3
 channels:
   - pytorch
   - conda-forge
@@ -27,10 +27,7 @@ dependencies:
   # Note for M1 macs: install this env with CONDA_SUBDIR=osx-64 (env var), as it
   # can't be installed for the native (osx-arm64) architecture.
   - pytorch=1.10.1
-  - mkl<2022 # prevents crash when importing torch on M1 mac via rosetta2
+  # mkl<2022 # Only needed for M1 mac via rosetta2 (CONDA_SUBDIR=osx-64), not for native ARM64
   - torchvision=0.11.2
-  - cudatoolkit=11.3
+  # cudatoolkit=11.3  # Not available on macOS - PyTorch will use CPU/Metal on Mac
   - torchtext
-
-platforms:
-  - linux-64
