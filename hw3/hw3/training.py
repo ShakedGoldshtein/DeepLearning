@@ -81,6 +81,7 @@ class Trainer(abc.ABC):
                 self.model.load_state_dict(saved_state["model_state"])
 
         for epoch in range(num_epochs):
+            actual_num_epochs += 1
             save_checkpoint = False
             verbose = False  # pass this to train/test_epoch.
             if epoch % print_every == 0 or epoch == num_epochs - 1:
@@ -94,7 +95,26 @@ class Trainer(abc.ABC):
             #  - Implement early stopping. This is a very useful and
             #    simple regularization technique that is highly recommended.
             # ====== YOUR CODE: ======
-            pass
+            train_result = self.train_epoch(dl_train)
+            test_result = self.test_epoch(dl_test)
+            train_loss.append(train_result.losses)
+            train_acc.append(train_result.accuracy)
+            test_loss.append(test_result.losses)
+            test_acc.append(test_result.accuracy)
+            if early_stopping is not None:
+                if best_acc is None:
+                    best_acc = test_result.accuracy
+                    epochs_without_improvement = 0
+                else:
+                    if test_result.accuracy > best_acc:
+                        best_acc = test_result.accuracy
+                        epochs_without_improvement = 0
+                        
+                    else:
+                        epochs_without_improvement += 1
+
+                    if epochs_without_improvement >= early_stopping:
+                        break
             # ========================
 
             # Save model checkpoint if requested
@@ -217,6 +237,7 @@ class Trainer(abc.ABC):
 
 class RNNTrainer(Trainer):
     def __init__(self, model, loss_fn, optimizer, device=None):
+        self.hidden_state = None
         super().__init__(model, loss_fn, optimizer, device)
 
     def train_epoch(self, dl_train: DataLoader, **kw):
@@ -247,7 +268,14 @@ class RNNTrainer(Trainer):
         #  - Update params
         #  - Calculate number of correct char predictions
         # ====== YOUR CODE: ======
-        pass
+        output, self.hidden_state = self.model(x, self.hidden_state)
+        self.hidden_state = self.hidden_state.to(self.device).detach()
+        output = output.to(self.device).transpose(1, 2)
+        self.optimizer.zero_grad() #### shaked change between 270 and 271
+        loss = self.loss_fn.forward(output, y)
+        loss.backward()
+        self.optimizer.step()
+        num_correct = (torch.argmax(output, dim=1).to(self.device) == y).sum()
         # ========================
 
         # Note: scaling num_correct by seq_len because each sample has seq_len
@@ -267,7 +295,12 @@ class RNNTrainer(Trainer):
             #  - Loss calculation
             #  - Calculate number of correct predictions
             # ====== YOUR CODE: ======
-            pass
+            self.hidden_state = None #### shaked
+            output, self.hidden_state = self.model(x, self.hidden_state)
+            self.hidden_state = self.hidden_state.to(self.device).detach()
+            output = output.to(self.device).transpose(1, 2)
+            loss = self.loss_fn.forward(output, y)
+            num_correct = (torch.argmax(output, dim=1).to(self.device) == y).sum()
             # ========================
 
         return BatchResult(loss.item(), num_correct.item() / seq_len)

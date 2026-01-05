@@ -132,7 +132,8 @@ def hot_softmax(y, dim=0, temperature=1.0):
     """
     # TODO: Implement based on the above.
     # ====== YOUR CODE: ======
-    pass
+    y = y / temperature
+    return torch.softmax(y, dim=dim)
     # ========================
 
 
@@ -167,7 +168,24 @@ def generate_from_model(model, start_sequence, n_chars, char_maps, T):
     #  necessary for this. Best to disable tracking for speed.
     #  See torch.no_grad().
     # ====== YOUR CODE: ======
-    pass
+    with torch.no_grad():
+        # 1. Feed the start_sequence into the model
+        embedded_start = chars_to_onehot(start_sequence, char_to_idx).to(device)
+        embedded_start = embedded_start.unsqueeze(0).type(torch.float)  # (1, N, V)
+        output, hidden_state = model(embedded_start)
+        
+        # Generate remaining characters
+        for _ in range(n_chars - len(start_sequence)):
+            # 2. Sample a new char from the output distribution of the last output char
+            output_probs = hot_softmax(output[0, -1], temperature=T)
+            next_char_idx = torch.multinomial(output_probs, num_samples=1).item()
+            next_char = idx_to_char[next_char_idx]
+            out_text += next_char
+            
+            # 3. Feed the new char into the model
+            embedded_input = chars_to_onehot(next_char, char_to_idx).to(device)  # (1, V)
+            embedded_input = embedded_input.view(1, 1, -1).type(torch.float)  # (1, 1, V)
+            output, hidden_state = model(embedded_input, hidden_state)
     # ========================
 
     return out_text
