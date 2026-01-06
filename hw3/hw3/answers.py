@@ -22,7 +22,16 @@ def part1_rnn_hyperparams():
     )
     # TODO: Set the hyperparameters to train the model.
     # ====== YOUR CODE: ======
-    pass
+    hypers = dict(
+        batch_size=128, #100
+        seq_len=64, # 100
+        h_dim=256,
+        n_layers=3, #2
+        dropout=0.2, #50.4
+        learn_rate=0.001, #0.005
+        lr_sched_factor=0.5, #0.5
+        lr_sched_patience=3, #5
+    )
     # ========================
     return hypers
 
@@ -32,25 +41,40 @@ def part1_generation_params():
     temperature = 0.0001
     # TODO: Tweak the parameters to generate a literary masterpiece.
     # ====== YOUR CODE: ======
-    pass
+    start_seq = """ACT I."""
+    temperature = 0.45
     # ========================
     return start_seq, temperature
 
 
 part1_q1 = r"""
-**Your answer:**
+First, training on the entire corpus as a single sequence is computationally infeasible, as it would require backpropagation through an extremely long sequence, leading to excessive memory usage and severe vanishing or exploding gradient issues.
+
+Second, treating the whole corpus as one sequence would yield only a single training sample and thus very few gradient updates per epoch. Splitting the data into many sequences produces multiple training samples, enabling frequent gradient updates and more effective optimization.
 """
 
 part1_q2 = r"""
-**Your answer:**
+Although the RNN is trained on fixed-length sequences, its hidden state is carried forward across time steps and summarizes past information in a compressed form. The hidden state has a fixed dimension that does not depend on the sequence length, and its parameters are shared across all time steps.
+
+As a result, during text generation the model can propagate information through the hidden state over arbitrarily many steps, allowing it to exhibit memory that exceeds the training sequence length.
 """
 
 part1_q3 = r"""
-**Your answer:**
+We do not shuffle the order of batches because the hidden state of the RNN is typically carried over between consecutive batches. Shuffling would break the temporal continuity of the data and make the propagated hidden state inconsistent with the input sequence.
+
+Therefore, batches must remain in their original order to preserve the sequential structure of the text and allow the model to learn long-range dependencies.
 """
 
 part1_q4 = r"""
-**Your answer:**
+1. The temperature parameter controls the sharpness of the sampling distribution. Lowering the temperature increases the distinctiveness between probabilities, making high-probability characters much more likely to be selected, which leads to more coherent and model-consistent text generation.
+
+2. When the temperature is very high, the softmax distribution approaches a uniform distribution. This follows from
+$$
+\text{softmax}_T(y_i) = \frac{e^{y_i/T}}{\sum_k e^{y_k/T}},
+$$
+since as $T \to \infty$, we have $y_i/T \to 0$ and thus $e^{y_i/T} \to 1$, resulting in nearly random sampling.
+
+3. When the temperature is very low, the distribution becomes extremely peaked. In the limit $T \to 0$, the softmax converges to an argmax operation, meaning the most likely character is selected almost deterministically.
 """
 # ==============
 
