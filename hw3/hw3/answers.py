@@ -24,11 +24,11 @@ def part1_rnn_hyperparams():
     # ====== YOUR CODE: ======
     hypers = dict(
         batch_size=128, #100
-        seq_len=64, # 100
+        seq_len=200, # 100
         h_dim=256,
-        n_layers=3, #2
-        dropout=0.2, #50.4
-        learn_rate=0.001, #0.005
+        n_layers=2, #2
+        dropout=0.4, #0.4
+        learn_rate=0.01, #0.005
         lr_sched_factor=0.5, #0.5
         lr_sched_patience=3, #5
     )
