@@ -106,7 +106,7 @@ class Trainer(abc.ABC):
                     best_acc = test_result.accuracy
                     epochs_without_improvement = 0
                 else:
-                    if test_result.accuracy > best_acc:
+                    if test_result.accuracy > best_acc + 0.1:
                         best_acc = test_result.accuracy
                         epochs_without_improvement = 0
                         
