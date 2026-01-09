@@ -101,20 +101,24 @@ class Trainer(abc.ABC):
             train_acc.append(train_result.accuracy)
             test_loss.append(test_result.losses)
             test_acc.append(test_result.accuracy)
-            if early_stopping is not None:
-                if best_acc is None:
-                    best_acc = test_result.accuracy
+            
+            # Track best accuracy for checkpoint saving and early stopping
+            if best_acc is None:
+                best_acc = test_result.accuracy
+                save_checkpoint = True  # Save checkpoint on first epoch
+                if early_stopping is not None:
                     epochs_without_improvement = 0
-                else:
-                    if test_result.accuracy > best_acc + 0.1:
-                        best_acc = test_result.accuracy
+            else:
+                if test_result.accuracy > best_acc + 0.1:
+                    best_acc = test_result.accuracy
+                    save_checkpoint = True  # Save checkpoint when accuracy improves
+                    if early_stopping is not None:
                         epochs_without_improvement = 0
-                        
-                    else:
+                else:
+                    if early_stopping is not None:
                         epochs_without_improvement += 1
-
-                    if epochs_without_improvement >= early_stopping:
-                        break
+                        if epochs_without_improvement >= early_stopping:
+                            break
             # ========================
 
             # Save model checkpoint if requested
