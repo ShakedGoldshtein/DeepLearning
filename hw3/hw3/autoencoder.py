@@ -187,19 +187,16 @@ def vae_loss(x, xr, z_mu, z_log_sigma2, x_sigma2):
     #  2. You need to average over the batch dimension.
     # ====== YOUR CODE: ======
     N, C, H, W = x.shape
-    d = C * H * W
+    dx = C * H * W
 
-    mse = (x - xr).pow(2).sum(dim=(1, 2, 3))  # per sample
-    data_loss = (1.0 / (2.0 * x_sigma2)) * mse
-
-    log_term = torch.log(torch.tensor(2 * torch.pi * x_sigma2, device=x.device, dtype=x.dtype))
-    data_loss = data_loss + (d / 2.0) * log_term
+    mse = (x - xr).pow(2).sum(dim=(1,2,3))     
+    data_loss = mse / (x_sigma2 * dx)          
     data_loss = data_loss.mean()
 
+    # KL divergence term
     z_sigma2 = torch.exp(z_log_sigma2)
-    kl = z_sigma2 + z_mu**2 - 1.0 - z_log_sigma2
-    kldiv_loss = 0.5 * kl.sum(dim=1)
-    kldiv_loss = kldiv_loss.mean()
+    kl = z_sigma2 + z_mu**2 - 1 - z_log_sigma2 
+    kldiv_loss = kl.sum(dim=1).mean()          
 
     loss = data_loss + kldiv_loss
     # ========================
