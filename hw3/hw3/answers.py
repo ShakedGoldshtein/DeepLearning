@@ -104,19 +104,24 @@ def part2_vae_hyperparams():
 
 
 part2_q1 = r"""
-**Your answer:**
+x_sigma2 represents how noisy we believe the data is. If the data is assumed to be clean and low-noise, a small x_sigma2 is appropriate and the model is strongly penalized for reconstruction errors (where reconstruction error means the difference between the identity mapping and the encoder–decoder composition), so it tries to match the input very closely. If the data is assumed to be noisy, a larger x_sigma2 makes sense, since deviations between the input and reconstruction can be explained as noise, which reduces the pressure to reconstruct every detail and shifts the focus toward learning a smooth, well-regularized latent representation.
 """
 
 part2_q2 = r"""
-**Your answer:**
+1. **Reconstruction loss** encourages the decoder to accurately reconstruct the input $x$ from its latent representation $z$, ensuring that the latent variables preserve the information needed to represent the data.  
+The **KL divergence loss** regularizes the encoder by pushing the learned posterior $q(z \mid x)$ to be close to a fixed prior (usually $\mathcal{N}(0, I)$). This acts as a form of stability: if the posterior distributions for different $x$ are very far apart or very different from the prior, some regions of latent space will almost never be sampled. Minimizing the KL term prevents this by keeping all latent codes well-aligned with the same global distribution.
+
+2. The KL loss shapes the latent space so that $q(z \mid x)$ stays close to the prior distribution, making the latent space smooth, continuous, and consistently distributed across different inputs.
+
+3. The benefit of this effect is that the model can reliably sample new latent variables from the prior and generate meaningful data, while also enabling smooth interpolations and avoiding unused or unstable regions in latent space, and it avoids "unfairness" in generating new data, as the conditioned distribution is actually acting as the normal distribution from which the z's are actuallty being sampled from.
 """
 
 part2_q3 = r"""
-**Your answer:**
+We start by maximizing the evidence $p(X)$ because the VAE is a generative probabilistic model whose goal is to learn a distribution that explains the observed data. Maximizing $p(X)$ ensures that the model assigns high probability to the training samples and therefore captures the true data distribution.
 """
 
 part2_q4 = r"""
-**Your answer:**
+The variance $\sigma^2$ is an output of a neural network whose outputs are unbounded, while the variance itself must be strictly positive. By predicting $\log(\sigma^2)$, the network can output any real value and still guarantee a valid positive variance after applying the exponential. This also improves numerical stability and is required because the VAE loss directly uses $\log(\sigma^2)$; allowing non-positive variance would make the loss undefined.
 """
 
 

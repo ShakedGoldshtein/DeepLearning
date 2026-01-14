@@ -109,7 +109,7 @@ class Trainer(abc.ABC):
                 if early_stopping is not None:
                     epochs_without_improvement = 0
             else:
-                if test_result.accuracy > best_acc + 0.1:
+                if int(test_result.accuracy) == 0 or test_result.accuracy > best_acc + 0.1:
                     best_acc = test_result.accuracy
                     save_checkpoint = True  # Save checkpoint when accuracy improves
                     if early_stopping is not None:

@@ -1,0 +1,154 @@
+r"""
+Use this module to write your answers to the questions in the notebook.
+
+Note: Inside the answer strings you can use Markdown format and also LaTeX
+math (delimited with $$).
+"""
+
+# ==============
+# Part 1 answers
+
+
+def part1_rnn_hyperparams():
+    hypers = dict(
+        batch_size=0,
+        seq_len=0,
+        h_dim=0,
+        n_layers=0,
+        dropout=0,
+        learn_rate=0.0,
+        lr_sched_factor=0.0,
+        lr_sched_patience=0,
+    )
+    # TODO: Set the hyperparameters to train the model.
+    # ====== YOUR CODE: ======
+    hypers = dict(
+        batch_size=128, #100
+        seq_len=64, # 100
+        h_dim=256,
+        n_layers=3, #2
+        dropout=0.2, #0.4
+        learn_rate=0.001, #0.005
+        lr_sched_factor=0.5, #0.5
+        lr_sched_patience=3, #5
+    )
+    # ========================
+    return hypers
+
+
+def part1_generation_params():
+    start_seq = ""
+    temperature = 0.0001
+    # TODO: Tweak the parameters to generate a literary masterpiece.
+    # ====== YOUR CODE: ======
+    start_seq = """ACT I."""
+    temperature = 0.5
+    # ========================
+    return start_seq, temperature
+
+
+part1_q1 = r"""
+First, training on the entire corpus as a single sequence is computationally infeasible, as it would require backpropagation through an extremely long sequence, leading to excessive memory usage and severe vanishing or exploding gradient issues.
+
+Second, treating the whole corpus as one sequence would yield only a single training sample and thus very few gradient updates per epoch. Splitting the data into many sequences produces multiple training samples, enabling frequent gradient updates and more effective optimization.
+"""
+
+part1_q2 = r"""
+Although the RNN is trained on fixed-length sequences, its hidden state is carried forward across time steps and summarizes past information in a compressed form. The hidden state has a fixed dimension that does not depend on the sequence length, and its parameters are shared across all time steps.
+
+As a result, during text generation the model can propagate information through the hidden state over arbitrarily many steps, allowing it to exhibit memory that exceeds the training sequence length.
+"""
+
+part1_q3 = r"""
+We do not shuffle the order of batches because the hidden state of the RNN is typically carried over between consecutive batches. Shuffling would break the temporal continuity of the data and make the propagated hidden state inconsistent with the input sequence.
+
+Therefore, batches must remain in their original order to preserve the sequential structure of the text and allow the model to learn long-range dependencies.
+"""
+
+part1_q4 = r"""
+1. The temperature parameter controls the sharpness of the sampling distribution. Lowering the temperature increases the distinctiveness between probabilities, making high-probability characters much more likely to be selected, which leads to more coherent and model-consistent text generation.
+
+2. When the temperature is very high, the softmax distribution approaches a uniform distribution. This follows from
+$$
+\text{softmax}_T(y_i) = \frac{e^{y_i/T}}{\sum_k e^{y_k/T}},
+$$
+since as $T \to \infty$, we have $y_i/T \to 0$ and thus $e^{y_i/T} \to 1$, resulting in nearly random sampling.
+
+3. When the temperature is very low, the distribution becomes extremely peaked. In the limit $T \to 0$, the softmax converges to an argmax operation, meaning the most likely character is selected almost deterministically.
+"""
+# ==============
+
+
+# ==============
+# Part 2 answers
+
+PART2_CUSTOM_DATA_URL = None
+
+
+def part2_vae_hyperparams():
+    hypers = dict(
+        batch_size=0, h_dim=0, z_dim=0, x_sigma2=0, learn_rate=0.0, betas=(0.0, 0.0),
+    )
+    # TODO: Tweak the hyperparameters to generate a former president.
+    # ====== YOUR CODE: ======
+    hypers = dict(
+        batch_size=64,
+        h_dim=1024,
+        z_dim=128,
+        x_sigma2=0.0005,
+        learn_rate=0.0002,
+        betas=(0.5, 0.999),
+    )
+    # ========================
+    return hypers
+
+
+part2_q1 = r"""
+x_sigma2 represents how noisy we believe the data is. If the data is assumed to be clean and low-noise, a small x_sigma2 is appropriate and the model is strongly penalized for reconstruction errors (where reconstruction error means the difference between the identity mapping and the encoder–decoder composition), so it tries to match the input very closely. If the data is assumed to be noisy, a larger x_sigma2 makes sense, since deviations between the input and reconstruction can be explained as noise, which reduces the pressure to reconstruct every detail and shifts the focus toward learning a smooth, well-regularized latent representation.
+"""
+
+part2_q2 = r"""
+1. **Reconstruction loss** encourages the decoder to accurately reconstruct the input $x$ from its latent representation $z$, ensuring that the latent variables preserve the information needed to represent the data.  
+The **KL divergence loss** regularizes the encoder by pushing the learned posterior $q(z \mid x)$ to be close to a fixed prior (usually $\mathcal{N}(0, I)$). This acts as a form of stability: if the posterior distributions for different $x$ are very far apart or very different from the prior, some regions of latent space will almost never be sampled. Minimizing the KL term prevents this by keeping all latent codes well-aligned with the same global distribution.
+
+2. The KL loss shapes the latent space so that $q(z \mid x)$ stays close to the prior distribution, making the latent space smooth, continuous, and consistently distributed across different inputs.
+
+3. The benefit of this effect is that the model can reliably sample new latent variables from the prior and generate meaningful data, while also enabling smooth interpolations and avoiding unused or unstable regions in latent space, and it avoids "unfairness" in generating new data, as the conditioned distribution is actually acting as the normal distribution from which the z's are actuallty being sampled from.
+"""
+
+part2_q3 = r"""
+We start by maximizing the evidence $p(X)$ because the VAE is a generative probabilistic model whose goal is to learn a distribution that explains the observed data. Maximizing $p(X)$ ensures that the model assigns high probability to the training samples and therefore captures the true data distribution.
+"""
+
+part2_q4 = r"""
+The variance $\sigma^2$ is an output of a neural network whose outputs are unbounded, while the variance itself must be strictly positive. By predicting $\log(\sigma^2)$, the network can output any real value and still guarantee a valid positive variance after applying the exponential. This also improves numerical stability and is required because the VAE loss directly uses $\log(\sigma^2)$; allowing non-positive variance would make the loss undefined.
+"""
+
+
+def part3_transformer_encoder_hyperparams():
+    hypers = dict(
+        embed_dim = 0, 
+        num_heads = 0,
+        num_layers = 0,
+        hidden_dim = 0,
+        window_size = 0,
+        droupout = 0.0,
+        lr=0.0,
+    )
+
+    # TODO: Tweak the hyperparameters to train the transformer encoder.
+    # ====== YOUR CODE: ======
+    pass
+    # ========================
+    return hypers
+
+
+part3_q1 = r"""
+**Your answer:**
+"""
+
+part3_q2 = r"""
+**Your answer:**
+"""
+
+# ==============
