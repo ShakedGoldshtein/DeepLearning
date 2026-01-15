@@ -26,7 +26,56 @@ def sliding_window_attention(q, k, v, window_size, padding_mask=None):
     values, attention = None, None
 
     # ====== YOUR CODE: ======
-    pass
+    device = q.device
+    half = window_size // 2
+    B = q.shape[0]
+    L = q.shape[-2]
+    D = q.shape[-1]
+
+    had_no_heads = (q.dim() == 3)
+    if had_no_heads:
+        q = q.unsqueeze(1)
+        k = k.unsqueeze(1)
+        v = v.unsqueeze(1)
+
+    B, H, L, D = q.shape
+
+    pos = torch.arange(L, device=device)
+    win_mask = (pos[:, None] - pos[None, :]).abs() <= half
+    row_idx, col_idx = win_mask.nonzero(as_tuple=True)
+
+    scores = torch.full(
+        q.shape[:-1] + (L,),
+        -float('inf'),
+        device=device
+    )
+    
+    q_window = q[..., row_idx, :]
+    k_window = k[..., col_idx, :]
+    
+    dot = (q_window * k_window).sum(dim=-1)
+    
+    dot = dot / math.sqrt(D)
+    
+    scores[..., row_idx, col_idx] = dot
+
+    # apply padding!
+    if padding_mask is not None:
+        key_mask = padding_mask[:, None, None, :] == 0
+        scores = scores.masked_fill(key_mask, -float('inf'))
+
+    # softmaxx
+    attention = torch.softmax(scores, dim=-1)
+    attention = attention.masked_fill(torch.isnan(attention), 0.0)
+
+    values = torch.matmul(attention, v)
+
+    if padding_mask is not None:
+        values = values.masked_fill(padding_mask[:, None, :, None] == 0, 0)
+
+    if had_no_heads:
+        attention = attention.squeeze(1)
+        values = values.squeeze(1)
     # ======================
 
     return values, attention
@@ -69,7 +118,7 @@ class MultiHeadAttention(nn.Module):
         # Determine value outputs
         # call the sliding window attention function you implemented
         # ====== YOUR CODE: ======
-        pass
+        values, attention = sliding_window_attention(q, k, v, self.window_size, padding_mask=padding_mask)
         # ========================
 
         values = values.permute(0, 2, 1, 3) # [Batch, SeqLen, Head, Dims]
@@ -146,7 +195,11 @@ class EncoderLayer(nn.Module):
         '''
 
         # ====== YOUR CODE: ======
-        pass
+        attn_out = self.self_attn(x, padding_mask)
+        x = self.norm1(x + self.dropout(attn_out))
+
+        ff_out = self.feed_forward(x)
+        x = self.norm2(x + self.dropout(ff_out))
         # ========================
         
         return x
@@ -188,7 +241,15 @@ class Encoder(nn.Module):
         output = None
 
         # ====== YOUR CODE: ======
-        pass
+        embedded = self.encoder_embedding(sentence)
+        encoded = self.positional_encoding(embedded)
+        encoded = self.dropout(encoded)
+
+        for layer in self.encoder_layers:
+            encoded = layer(encoded, padding_mask)
+
+        cls_token = encoded[:, 0, :]
+        output = self.classification_mlp(cls_token)
         # ========================
         
         

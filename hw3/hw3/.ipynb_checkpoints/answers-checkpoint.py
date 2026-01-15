@@ -138,7 +138,15 @@ def part3_transformer_encoder_hyperparams():
 
     # TODO: Tweak the hyperparameters to train the transformer encoder.
     # ====== YOUR CODE: ======
-    pass
+    hypers = dict(
+        embed_dim=128,
+        num_heads=4,
+        num_layers=4,
+        hidden_dim=128,
+        window_size=128,
+        droupout=0.2,
+        lr=0.0001,
+    )
     # ========================
     return hypers
 

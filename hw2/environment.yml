@@ -1,4 +1,4 @@
-name: cs236781-hw
+name: cs236781-hw12
 channels:
   - pytorch
   - conda-forge
@@ -33,5 +33,3 @@ dependencies:
   - torchvision
   - torchtext
 
-platforms:
-  - linux-64

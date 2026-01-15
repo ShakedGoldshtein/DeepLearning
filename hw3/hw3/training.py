@@ -382,7 +382,10 @@ class TransformerEncoderTrainer(Trainer):
             # TODO:
             #  fill out the testing loop.
             # ====== YOUR CODE: ======
-            pass
+            predic = self.model(input_ids, attention_mask).to(self.device)
+            loss = self.loss_fn(predic.squeeze(-1), label)
+            ys = torch.round(torch.sigmoid(predic)).float()
+            num_correct = torch.sum((ys.squeeze(-1) == label))
             # ========================
 
 
