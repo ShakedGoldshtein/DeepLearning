@@ -152,11 +152,30 @@ def part3_transformer_encoder_hyperparams():
 
 
 part3_q1 = r"""
-**Your answer:**
+Stacking encoder layers with sliding-window attention increases the effective context size of the representation, even though each individual layer attends only to a local neighborhood.
+
+In a single sliding-window attention layer, each token aggregates information only from tokens within a fixed window around it. As a result, after one layer, a token’s representation contains information from its immediate neighbors only.
+
+However, when multiple such layers are stacked, information propagates outward across layers. After the first layer, each token encodes information about its local neighbors. In the second layer, the token attends to the updated representations of those neighbors, which already contain information from *their* neighbors. Consequently, the token now indirectly incorporates information from a larger neighborhood. Repeating this process over multiple layers progressively expands the effective receptive field.
+
+This is analogous to stacking convolutional layers in CNNs. While a single convolutional layer has a limited receptive field, stacking multiple layers causes the receptive field to grow, allowing deeper layers to capture broader spatial context. Similarly, stacking sliding-window attention layers results in a growing contextual span, enabling the final layers to represent long-range dependencies despite each layer using only local attention. The sliding window cannbe percieved as a one dimensional concolutional filter for this matter.
+
 """
 
 part3_q2 = r"""
-**Your answer:**
+Another variation is to use dilated sliding-window attention.
+Each token attends to $w$ positions, but spaced every $d$ tokens instead of being contiguous.
+This preserves $O(nw)$ time complexity, since each token still attends to only $w$ keys.
+
+Dilated windows allow information to propagate over longer distances in fewer layers:
+the effective receptive field grows roughly by a factor of $d$ per layer, rather than
+linearly as in standard sliding-window attention. As a result, fewer layers are needed
+to share global information.
+
+A limitation is that dilated attention may skip nearby tokens, potentially losing
+fine-grained local interactions unless combined with non-dilated windows or multiple
+attention heads with different dilation rates.
+
 """
 
 # ==============
